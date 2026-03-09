@@ -1,0 +1,24 @@
+{
+  "name": "jolibee",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/DyDy2703/TeamNodeJS#readme",
+  "bugs": {
+    "url": "https://github.com/DyDy2703/TeamNodeJS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+hhttps://github.com/DyDy2703/Jolliebee.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1"
+  }
+}
