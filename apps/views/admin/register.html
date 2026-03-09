@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register User - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="card login-card">
+      <h2>Create User Account</h2>
+      <p>Tai khoan dang ky moi mac dinh co role la <strong>user</strong>.</p>
+
+      <div id="errorMessage" class="message error"></div>
+
+      <form method="post" action="/admin/register">
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required />
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+      </form>
+
+      <p style="margin-top: 12px;"><a href="/admin/login">Ve trang login</a></p>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    const errorBox = document.getElementById("errorMessage");
+
+    const errorMap = {
+      missing: "Vui long nhap day du username va password.",
+      exists: "Username da ton tai.",
+      db: "Khong ket noi duoc MongoDB."
+    };
+
+    if (error && errorMap[error]) {
+      errorBox.textContent = errorMap[error];
+      errorBox.classList.add("show");
+    }
+  </script>
+</body>
+</html>

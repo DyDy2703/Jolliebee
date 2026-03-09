@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="card topbar">
+      <div class="brand">Jolliebee Dashboard</div>
+      <nav class="nav" id="navLinks">
+        <a href="/">Home</a>
+        <a href="/products/category">Danh muc</a>
+        <a href="/products">San pham</a>
+      </nav>
+      <form class="inline" method="post" action="/admin/logout">
+        <button class="btn btn-light" type="submit">Logout</button>
+      </form>
+    </header>
+
+    <section class="card panel">
+      <div class="hero">
+        <article class="hero-main">
+          <h1 class="hero-title">Jolliebee Control Hub</h1>
+          <p id="welcomeText">Dang tai thong tin nguoi dung...</p>
+        </article>
+        <aside class="hero-side">
+          <h3>Truy cap nhanh</h3>
+          <div class="quick-links">
+            <a class="quick-link" href="/products/category">Danh muc san pham</a>
+            <a class="quick-link" href="/products">Danh sach san pham</a>
+            <a class="quick-link" id="adminLink" href="/admin/categories" style="display:none">Khu vuc admin</a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="grid">
+        <article class="stat">
+          <h3><span class="dot"></span>Danh muc</h3>
+          <p>Giao dien flower template cho trang tu chon.</p>
+          <a href="/products/category">Mo danh muc</a>
+        </article>
+        <article class="stat">
+          <h3><span class="dot"></span>San pham</h3>
+          <p>Danh sach san pham cho user va admin.</p>
+          <a href="/products">Mo san pham</a>
+        </article>
+        <article class="stat" id="adminCard" style="display:none">
+          <h3><span class="dot"></span>Admin Tools</h3>
+          <p>Quan ly danh muc, san pham va nguoi dung.</p>
+          <a href="/admin/categories">Mo admin tools</a>
+        </article>
+      </div>
+    </section>
+
+    <footer class="card site-footer">
+      <p>Jolliebee Team | Email: <a href="mailto:trankimthanh230@gmail.com">trankimthanh230@gmail.com</a></p>
+    </footer>
+  </div>
+
+  <script>
+    async function init() {
+      const nav = document.getElementById("navLinks");
+      const welcomeText = document.getElementById("welcomeText");
+      const adminCard = document.getElementById("adminCard");
+      const adminLink = document.getElementById("adminLink");
+
+      try {
+        const res = await fetch("/api/me");
+        const me = await res.json();
+        welcomeText.textContent = `Xin chao ${me.username}`;
+
+        if (me.role === "admin") {
+          adminCard.style.display = "block";
+          adminLink.style.display = "block";
+          nav.insertAdjacentHTML(
+            "beforeend",
+            '<a href="/admin/categories">Admin danh muc</a><a href="/admin/products">Admin san pham</a><a href="/admin/users">Admin users</a>'
+          );
+        }
+      } catch (err) {
+        welcomeText.textContent = "Khong tai duoc thong tin user.";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

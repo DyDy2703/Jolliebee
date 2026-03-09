@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="card topbar">
+      <div class="brand">Jolliebee Dashboard</div>
+      <nav class="nav" id="navLinks">
+        <a href="/">Home</a>
+        <a href="/products/category">Danh muc</a>
+        <a href="/products">San pham</a>
+      </nav>
+      <form class="inline" method="post" action="/admin/logout">
+        <button class="btn btn-light" type="submit">Logout</button>
+      </form>
+    </header>
+
+    <section class="card panel">
+      <div class="section-head">
+        <h1>Danh sach san pham</h1>
+        <a id="addProductBtn" class="btn btn-primary" href="/admin/products" style="display:none">Them san pham</a>
+      </div>
+      <p>User va admin deu co quyen xem trang nay.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ten san pham</th>
+              <th>Danh muc</th>
+              <th>Gia</th>
+              <th>Trang thai</th>
+            </tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    async function init() {
+      const nav = document.getElementById("navLinks");
+      const table = document.getElementById("productTable");
+      const addProductBtn = document.getElementById("addProductBtn");
+      try {
+        const meRes = await fetch("/api/me");
+        const me = await meRes.json();
+        if (me.role === "admin") {
+          addProductBtn.style.display = "inline-block";
+          nav.insertAdjacentHTML("beforeend", '<a href="/admin/categories">Admin danh muc</a><a href="/admin/products">Admin san pham</a><a href="/admin/users">Admin users</a>');
+        }
+
+        const res = await fetch("/api/products");
+        const products = await res.json();
+        if (!products.length) {
+          table.innerHTML = '<tr><td colspan="4">Chua co san pham.</td></tr>';
+          return;
+        }
+
+        table.innerHTML = products.map((p) => `
+          <tr>
+            <td>${p.name}</td>
+            <td>${p.category || "-"}</td>
+            <td>$${Number(p.price || 0).toFixed(2)}</td>
+            <td>${p.status || "Con hang"}</td>
+          </tr>
+        `).join("");
+      } catch (error) {
+        table.innerHTML = '<tr><td colspan="4">Khong tai duoc san pham.</td></tr>';
+      }
+    }
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Products - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="card topbar">
+      <div class="brand">Admin Panel</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/products/category">Danh muc public</a>
+        <a href="/products">San pham public</a>
+        <a href="/admin/categories">Quan ly danh muc</a>
+        <a href="/admin/products">Quan ly san pham</a>
+        <a href="/admin/users">Danh sach user</a>
+      </nav>
+      <form class="inline" method="post" action="/admin/logout">
+        <button class="btn btn-light" type="submit">Logout</button>
+      </form>
+    </header>
+
+    <section class="card panel">
+      <h1>Quan ly san pham</h1>
+      <p>Chi admin moi co quyen them san pham.</p>
+      <div id="msg" class="message info"></div>
+
+      <button id="openModal" class="btn btn-primary" type="button">Nhap san pham (popup)</button>
+
+      <h2 style="margin-top: 18px;">Danh sach san pham</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ten</th>
+              <th>Danh muc</th>
+              <th>Gia</th>
+              <th>Trang thai</th>
+            </tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <section class="card dialog">
+      <h3>Nhap san pham moi</h3>
+      <p>Thong tin duoc luu vao MongoDB.</p>
+      <form id="productForm">
+        <div class="field">
+          <label for="name">Ten san pham</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+        <div class="field">
+          <label for="category">Danh muc</label>
+          <select id="category" name="category">
+            <option value="">Chon danh muc</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="price">Gia</label>
+          <input id="price" name="price" type="number" min="0" step="0.01" required />
+        </div>
+        <div class="actions">
+          <button id="closeModal" class="btn btn-light" type="button">Dong</button>
+          <button class="btn btn-primary" type="submit">Luu san pham</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const msg = document.getElementById("msg");
+    const table = document.getElementById("productTable");
+    const form = document.getElementById("productForm");
+    const modal = document.getElementById("modal");
+    const openModalBtn = document.getElementById("openModal");
+    const closeModalBtn = document.getElementById("closeModal");
+
+    function show(text, type) {
+      msg.textContent = text;
+      msg.className = `message ${type} show`;
+    }
+
+    function openModal() {
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    openModalBtn.addEventListener("click", openModal);
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    async function loadProducts() {
+      const res = await fetch("/api/products");
+      const products = await res.json();
+      if (!products.length) {
+        table.innerHTML = '<tr><td colspan="4">Chua co san pham.</td></tr>';
+        return;
+      }
+      table.innerHTML = products
+        .map(
+          (p) => `
+        <tr>
+          <td>${p.name}</td>
+          <td>${p.category || "-"}</td>
+          <td>$${Number(p.price || 0).toFixed(2)}</td>
+          <td>${p.status || "Con hang"}</td>
+        </tr>
+      `
+        )
+        .join("");
+    }
+
+    async function loadCategories() {
+      try {
+        const res = await fetch("/api/categories");
+        const categories = await res.json();
+        const categorySelect = document.getElementById("category");
+        const options = categories
+          .map((c) => `<option value="${c.name}">${c.name}</option>`)
+          .join("");
+        categorySelect.insertAdjacentHTML("beforeend", options);
+      } catch (error) {
+        show("Khong tai duoc danh muc.", "error");
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: form.name.value.trim(),
+        category: form.category.value,
+        price: form.price.value,
+      };
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        show("Them san pham that bai.", "error");
+        return;
+      }
+
+      show("Them san pham thanh cong.", "info");
+      form.reset();
+      closeModal();
+      loadProducts();
+    });
+
+    if (window.location.pathname === "/admin/products/new") {
+      openModal();
+    }
+
+    loadCategories();
+    loadProducts();
+  </script>
+</body>
+</html>
