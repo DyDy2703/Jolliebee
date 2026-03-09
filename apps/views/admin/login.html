@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <main class="login-wrap">
+    <section class="card login-card">
+      <h2>Welcome Back</h2>
+      <p>Dang nhap de truy cap he thong Jolliebee.</p>
+
+      <div id="errorMessage" class="message error"></div>
+      <div id="infoMessage" class="message info"></div>
+
+      <form method="post" action="/admin/login">
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required />
+        </div>
+        <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+
+      <p style="margin-top: 12px;">
+        Chua co tai khoan?
+        <a href="/admin/register">Dang ky user</a>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    const info = params.get("info");
+    const errorBox = document.getElementById("errorMessage");
+    const infoBox = document.getElementById("infoMessage");
+
+    const errorMap = {
+      missing: "Vui long nhap day du username va password.",
+      invalid: "Sai tai khoan hoac mat khau.",
+      db: "Khong ket noi duoc MongoDB. Kiem tra mongod va DB Jolliebee."
+    };
+
+    const infoMap = {
+      logout: "Ban da dang xuat thanh cong.",
+      registered: "Dang ky thanh cong. Hay dang nhap."
+    };
+
+    if (error && errorMap[error]) {
+      errorBox.textContent = errorMap[error];
+      errorBox.classList.add("show");
+    }
+
+    if (info && infoMap[info]) {
+      infoBox.textContent = infoMap[info];
+      infoBox.classList.add("show");
+    }
+  </script>
+</body>
+</html>

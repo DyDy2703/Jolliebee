@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Users - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="card topbar">
+      <div class="brand">Admin Panel</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/products/category">Danh muc public</a>
+        <a href="/products">San pham public</a>
+        <a href="/admin/categories">Quan ly danh muc</a>
+        <a href="/admin/products">Quan ly san pham</a>
+        <a href="/admin/users">Danh sach user</a>
+      </nav>
+      <form class="inline" method="post" action="/admin/logout">
+        <button class="btn btn-light" type="submit">Logout</button>
+      </form>
+    </header>
+
+    <section class="card panel">
+      <div class="hero" style="margin-bottom: 12px;">
+        <article class="hero-main">
+          <h1 class="hero-title">Danh Sach Nguoi Dung</h1>
+          <p>Bang theo doi tat ca tai khoan dang co trong he thong.</p>
+          <span class="hero-chip">permission: admin</span>
+          <span class="hero-chip">module: users</span>
+        </article>
+        <aside class="hero-side">
+          <h3>Hanh dong nhanh</h3>
+          <div class="quick-links">
+            <a class="quick-link" href="/admin/categories">Quan ly danh muc</a>
+            <a class="quick-link" href="/admin/products">Quan ly san pham</a>
+          </div>
+        </aside>
+      </div>
+
+      <article class="stat">
+        <h3><span class="dot"></span>Danh sach user</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    async function loadUsers() {
+      const table = document.getElementById("userTable");
+      try {
+        const res = await fetch("/api/users");
+        const users = await res.json();
+        if (!users.length) {
+          table.innerHTML = '<tr><td colspan="3">Chua co user.</td></tr>';
+          return;
+        }
+        table.innerHTML = users.map((u) => `
+          <tr>
+            <td>${u.username}</td>
+            <td>${u.role || "user"}</td>
+            <td>${u.createdAt ? new Date(u.createdAt).toLocaleString() : "-"}</td>
+          </tr>
+        `).join("");
+      } catch (error) {
+        table.innerHTML = '<tr><td colspan="3">Khong tai duoc user.</td></tr>';
+      }
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>

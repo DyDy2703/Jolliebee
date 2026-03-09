@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Categories - Jolliebee</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="card topbar">
+      <div class="brand">Admin Panel</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/products/category">Danh muc public</a>
+        <a href="/products">San pham public</a>
+        <a href="/admin/categories">Quan ly danh muc</a>
+        <a href="/admin/products">Quan ly san pham</a>
+        <a href="/admin/users">Danh sach user</a>
+      </nav>
+      <form class="inline" method="post" action="/admin/logout">
+        <button class="btn btn-light" type="submit">Logout</button>
+      </form>
+    </header>
+
+    <section class="card panel">
+      <div class="hero" style="margin-bottom: 12px;">
+        <article class="hero-main">
+          <h1 class="hero-title">Quan Ly Danh Muc</h1>
+          <p>Admin co the tao danh muc moi va theo doi danh sach danh muc.</p>
+          <span class="hero-chip">permission: admin</span>
+          <span class="hero-chip">module: categories</span>
+        </article>
+        <aside class="hero-side">
+          <h3>Hanh dong nhanh</h3>
+          <div class="quick-links">
+            <a class="quick-link" href="/admin/products">Sang quan ly san pham</a>
+            <a class="quick-link" href="/admin/users">Xem danh sach user</a>
+          </div>
+        </aside>
+      </div>
+
+      <div id="msg" class="message info"></div>
+
+      <div class="grid" style="grid-template-columns: 1fr 1fr;">
+        <article class="stat">
+          <h3><span class="dot"></span>Them danh muc</h3>
+          <form id="categoryForm">
+            <div class="field">
+              <label for="name">Ten danh muc</label>
+              <input id="name" name="name" type="text" required />
+            </div>
+            <div class="field">
+              <label for="description">Mo ta</label>
+              <input id="description" name="description" type="text" />
+            </div>
+            <button class="btn btn-primary" type="submit">Luu danh muc</button>
+          </form>
+        </article>
+
+        <article class="stat">
+          <h3><span class="dot"></span>Danh muc hien tai</h3>
+          <div class="grid" id="categoryGrid"></div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const msg = document.getElementById("msg");
+    const form = document.getElementById("categoryForm");
+    const grid = document.getElementById("categoryGrid");
+
+    function show(text, type) {
+      msg.textContent = text;
+      msg.className = `message ${type} show`;
+    }
+
+    async function loadCategories() {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      if (!data.length) {
+        grid.innerHTML = '<article class="stat"><h3>Chua co danh muc</h3></article>';
+        return;
+      }
+      grid.innerHTML = data.map((c) => `
+        <article class="stat">
+          <h3>${c.name}</h3>
+          <p>${c.description || "Khong co mo ta"}</p>
+        </article>
+      `).join("");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: form.name.value.trim(),
+        description: form.description.value.trim(),
+      };
+
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        show("Them danh muc that bai.", "error");
+        return;
+      }
+
+      show("Them danh muc thanh cong.", "info");
+      form.reset();
+      loadCategories();
+    });
+
+    loadCategories();
+  </script>
+</body>
+</html>
